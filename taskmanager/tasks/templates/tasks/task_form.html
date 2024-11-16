@@ -1,0 +1,46 @@
+<!-- tasks/templates/tasks/task_form.html -->
+{% extends 'tasks/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ action }} Task</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" id="taskForm">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">{{ action }} Task</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('taskForm').addEventListener('submit', function(e) {
+    const title = document.getElementById('id_title').value;
+    const description = document.getElementById('id_description').value;
+    const dueDate = document.getElementById('id_due_date').value;
+    let isValid = true;
+
+    if (!title.trim()) {
+        alert('Title is required');
+        isValid = false;
+    }
+    if (!description.trim()) {
+        alert('Description is required');
+        isValid = false;
+    }
+    if (!dueDate) {
+        alert('Due date is required');
+        isValid = false;
+    }
+
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
+</script>
+{% endblock %}

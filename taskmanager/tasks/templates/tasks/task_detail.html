@@ -1,0 +1,43 @@
+<!-- tasks/templates/tasks/task_detail.html -->
+{% extends 'tasks/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ task.title }}</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h5>Description:</h5>
+                <p>{{ task.description }}</p>
+                
+                <h5>Status:</h5>
+                <p><span class="badge bg-{{ task.status|yesno:'success,warning' }}">{{ task.status }}</span></p>
+                
+                <h5>Due Date:</h5>
+                <p>{{ task.due_date|date:"M d, Y H:i" }}</p>
+                
+                <h5>Assigned To:</h5>
+                <ul>
+                    {% for user in task.assigned_to.all %}
+                    <li>{{ user.username }}</li>
+                    {% empty %}
+                    <li>No assignments yet</li>
+                    {% endfor %}
+                </ul>
+                
+                <h5>Created By:</h5>
+                <p>{{ task.created_by.username }}</p>
+            </div>
+            <div class="col-md-4">
+                <form method="POST" class="mb-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary w-100">Assign to Me</button>
+                </form>
+                <a href="{% url 'task_update' task.pk %}" class="btn btn-warning w-100">Update Task</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
