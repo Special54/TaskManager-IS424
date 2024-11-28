@@ -3,41 +3,46 @@
 
 {% block content %}
 <div class="card">
-    <div class="card-header">
-        <h2>{{ task.title }}</h2>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Task Details</h2>
+        {% if task.created_by == request.user %}
+        <div>
+            <a href="{% url 'task_update' task.pk %}" class="btn btn-warning">Edit Task</a>
+            <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger">Delete Task</a>
+        </div>
+        {% endif %}
     </div>
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <h5>Description:</h5>
-                <p>{{ task.description }}</p>
-                
-                <h5>Status:</h5>
-                <p><span class="badge bg-{{ task.status|yesno:'success,warning' }}">{{ task.status }}</span></p>
-                
-                <h5>Due Date:</h5>
-                <p>{{ task.due_date|date:"M d, Y H:i" }}</p>
-                
-                <h5>Assigned To:</h5>
-                <ul>
-                    {% for user in task.assigned_to.all %}
-                    <li>{{ user.username }}</li>
-                    {% empty %}
-                    <li>No assignments yet</li>
-                    {% endfor %}
-                </ul>
-                
-                <h5>Created By:</h5>
-                <p>{{ task.created_by.username }}</p>
-            </div>
-            <div class="col-md-4">
-                <form method="POST" class="mb-3">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary w-100">Assign to Me</button>
-                </form>
-                <a href="{% url 'task_update' task.pk %}" class="btn btn-warning w-100">Update Task</a>
-            </div>
-        </div>
+        <dl class="row">
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">{{ task.title }}</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">{{ task.description }}</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">
+                <span class="badge bg-{{ task.status|yesno:'success,warning' }}">{{ task.status }}</span>
+            </dd>
+
+            <dt class="col-sm-3">Due Date</dt>
+            <dd class="col-sm-9">{{ task.due_date|date:"M d, Y H:i" }}</dd>
+
+            <dt class="col-sm-3">Created By</dt>
+            <dd class="col-sm-9">{{ task.created_by.get_full_name|default:task.created_by.username }}</dd>
+
+            <dt class="col-sm-3">Assigned To</dt>
+            <dd class="col-sm-9">
+                {% for user in task.assigned_to.all %}
+                    {{ user.get_full_name|default:user.username }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                    <span class="text-muted">Unassigned</span>
+                {% endfor %}
+            </dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'task_list' %}" class="btn btn-secondary">Back to Tasks</a>
     </div>
 </div>
 {% endblock %}
